@@ -1,0 +1,386 @@
+이번 강의는 행맨 게임과는 다른 방식으로 구현될 것이다.
+일단 app.js 의 function app() {} 와 연결된 것은 app.css라는 것은 알 것이다.
+yarn build 를 통해 build 를 만든 후 index.html의 경로를 수정해야 한다.
+    # ="/ 를 ="./ 로 변경해서 저장해야 한다.
+    # ctrl + h 를 통해 변경 가능하다.
+
+이전의 행맨 게임을 만들 때 사용했던 스타일은 순수자바스크립트로
+    function Welcome(props) {
+        return <h1>Hello, {props.name}</h1>;
+    }
+와 같은 스타일이였다.
+
+이번에는 ES6 를 이용할 것이다.
+    class Welcome extends React.Component {
+      render() {
+        return <h1>Hello, {this.props.name}</h1>;
+      }
+    }
+
+둘은 문법의 차이만 있을 뿐 문법의 차이는 없다.
+
+컴포넌트를 빠르게 만드는 플러그 인을 사용해야 하는데 VS확장에셋에서
+ES7+ React/Redux ... dsznajder 의 에셋을 설치한다.
+
+본격적으로 컴포넌트 작성을 위해 기본 세팅을 지울 것 이다.
+1.app.js 의 모든 데이터를 지운다.
+
+2.rcc 를 하면 자동완성으로 컴포넌트 폼이 완성이 된다.
+- 컴포넌트는 외부출력이 가능하게 추출해주는 것이 필수다.
+- 따라서 기존문장인
+    export default class App extends Component {
+      render() {
+        return (
+          <div>App</div>
+        )
+      }
+    }
+  는 두줄로 작성하면
+    export class App Component {
+      render() {
+        return (
+          <div>App</div>
+        )
+      }
+    }
+    export default App;
+  와 같다.
+  default 가 없다면 반드시 index.html 의 import 에서
+  import {App} from './App'; 중괄호로 app 을 변수화해야 한다.
+
+3. header 영역의 Component 를 연결한다.
+- class Myheader 를 만들어준다. rcc tab 후 바꾸자
+- header 로 들어갈 내용을 넣어준다.
+- 기존의 App 컴포넌트의 return 안으로 component 인 Myheader를 넣는다.
+
+4. nav 영역의 Component 를 연결한다.
+- class Mynav 를 만들어준다.
+- ul 로 들어갈 내용을 넣어준다.
+- App 컴포넌트의 return 안으로  component 인 Mynav를 넣는다.
+
+5. article 영역의 Component 를 연결한다.
+- class Myarticle 를 만들어준다.
+- 제목으로 들어갈 내용을 넣어준다.
+- App 컴포넌트의 return 안으로  component 인 Myarticle를 넣는다.
+
+6. 컴포넌트 속성을 넣어본다. Component props
+- Myheader 에 title , desc 속성추가 (html의 속성으로 착각말기!)
+- 이전의 스타일인 ES5
+    function Welcome(props) {
+      return <h1>Hello, {props.name}</h1>;
+    }
+  와 같은 스타일이였다. 이를 ES6 스타일로 변경하여
+  <Myheader> 에 속성을추가하여
+  <Myheader title="React" desc="Single Page Application"/>
+  로 바꾸어준다.
+- class Myheader로 넘어와 기존의
+  <h1 className="logo">React</h1>
+  <p>Single Page Application</p>
+  를
+  <h1 className="logo">{this.props.title}</h1>
+  <p>{this.props.desc}</p>
+  로 바꾸어준다.
+- Myarticle 도 같은 스타일로 변경해준다.
+
+7. App.js 에 한정된 Component 를 분리하여 공용화(모듈화)하는 작업
+- 이렇게 만들어진 Component 는 4개이다.
+- 어디서든 사용가능하게 만들어주기 위해 각각의 js 로 분리한다.
+- Myheader.js 생성 후 rcc 를 이용하여 내용을 옮겨온다.
+- App.js 의 상단에 import 로 연결해준다.
+- 나머지 Component 도 같은 방식으로 연결한다.
+  이렇게 생성된 js = Myheader.js , Mynav.js , Myarticle.js 이다.
+
+  8. title , desc 와같이 하드코딩된 값을 변수화하는 작업 constructor
+  - 반드시 render 위에 있어야 한다.
+  - constructor 는 메서드를 바인딩한다. 이벤트에 따라 값을 바꿀일이
+    있을 때 state를 통해 바꾼다. 
+    즉 메서드를 통해 바꿀 값이 있을 경우에 사용한다.
+      constructor(props) {
+        super(props);
+        // 여기서 this.setState()를 호출하면 안 됩니다!
+        this.state = { counter: 0 };
+        this.handleClick = this.handleClick.bind(this);
+      }
+    constructor 는 해당 컴포넌트가 마운트되기 전에 호출된다.   
+  - state 에 바뀔 요소들을 잡아준다. title & desc
+  - 이를 새롭게 정의한다 or 초기화 라고 한다.
+
+  9. Mynav 의 ul 을 내용추가를 위해 반복문으로 만들어주기.
+  - Component 에 menus 추가해준다.
+  - render 의 Mynav 의 title 을 component 에 연결한다.
+  - 배열을 만들어주기 위해 [] 를 이용해야 한다. id 를 통해 인덱스 넘버정립
+  - Mynav 에 data 라는 속성으로 넘겨준다.
+
+  10. Mynav.js 로 이동하여 반복문을 이용해 제어한다.
+  - 기존의 하드코딩된 li 삭제후 lists 를 출력하도록 만든다.
+  - render 아래에 변수면 lists 를 배열로 만들어준다.
+    App.js 에서 data 로 넘겼으니 data 가 무엇인지 만들어준다.
+    this.props.data 로 전처럼 넘겨주면 된다.
+    하지만 여러개를, 이후로도 쌓일 데이터를 차곡차곡 쌓기 위헤 []로 같이
+    담아주어야 한다. 반복문을 이용할 것이다.
+    let data = this.props.data; <- 한번더 변수로 만들어주는 작업이다.
+  - 배열을 쌓는 방법은 다음과 같다.
+      let arr1 = [1,2];
+      arr1.push(3);
+      console.log(arr1) = (3) [1,2,3] 
+  - while(i < length){
+      반복할일
+      증감
+    }
+  - {data[i].title} 를 통해 menus:[] 의 값을 받아오도록 한다.
+  - 웹 페이지를 체크하면 warning 에 "key" props 이 있다.
+    반복문엔 반드시 키값이 필요하다는 말로 우리에겐 필요없지만
+    리엑트에 필요한 문법이다. 따라서 while 문의 li 에 key 를 추가한다.
+    id 값을 불러오기때문에 data.[i].id 가 나오며 key 값은 "" 를 안쓴다.
+
+  11. Myarticle 은 현재 하드코딩으로 되어있어 값을 못바꾼다. 변수화시킨다.
+  - logo 를 클릭시 초기화면을 출력하고 li 클릭마다 article 의 변화를 준다.
+  - logo 의 h1 태그에 a 태그를 추가한다.
+  - App.js 로 이동하여 컴포넌트에 welcome 변수를 추가한다.
+  - welcome 변수명은 초기화면으로 나와야 한다. 하드코딩된 Myarticle 의 값을
+    {this.state.welcome.xx} 로 변경한다.
+
+  12. 모드(mode) 만들어보기
+  - 메뉴를 클릭하기전에는 welcome 으로 존재하다가 클릭시 read 로 바뀌게 한다.
+  - 모드는 render 안에서 if 를 사용할 것이다.
+    아직은 만들지 않은 변수 mode 가 welcome 단어와 일치할때
+    _title, _desc 의 값을 welcome 으로 바꾸어준다.
+    Myarticle 은 이제 변수값을 넣으면 되기에 {_title},{_desc}를 넣는다.
+  - 컴포넌트에 mode 를 추가한다.
+  - read 가 읽혔을 때는 menus 가 읽혀지길 원하는 것이기 때문에
+    this.state.menus[0].title; 를 넣어준다.
+
+  13. 이벤트 연결하기.
+  - js render 안에 console.log('App.js 실행됨'); 테스트해보기
+    app -> header > nav > article 순서대로 실행된 것을 확인할 수 있다.
+  - h1 클릭시 welcome 이 나와야하기 때문에 Myheader 의 header를 가져온 뒤
+    app.js 의 Myheader를 주석처리한다.
+    컴포넌트를 불러온 것이 아닌 본문에서 사용하는 것이기 떄문에 props 를
+    원래의 변수명인 subject 로 변경해준다.
+  - onClick 이벤트 추가한 뒤 preventDefault 로 a 역할을 막아준다.
+  - 이벤트연결을 위해 함수를 추가해주려면 bind(this) 로 연결해야 한다.
+  - setState 를 활용해 모드를 변경해준다.
+  - 현재는 테스트단계이기 때문에 컴포넌트의 mode 값을 read 로 변경하고
+    return 의 헤더의 mode 는 welcome 으로 변경할 것이다.
+  - 정상작동 확인 후 header 를 주석처리하고 Myheader 의 주석을 해제한다.
+      {/* <header>
+            <h1 className="logo">
+              <a href="" 
+                 onClick={
+                   function(e){
+                     e.preventDefault();
+                     this.setState({
+                      mode: 'welcome'
+                     });
+                   }.bind(this)
+                 }
+              >{this.state.subject.title}</a>
+            </h1>
+            <p>{this.state.subject.desc}</p>
+          </header> */}
+  - Myheader 에도 클릭이벤트를 주기위해 onChangePage 를 추가한다.
+    주석처리한 onClick 함수의 내용을 onChangePage에 넣어준다.
+  - Myheader.js 에서 a 태그에 onClick 이벤트를 걸어준다.
+  - this.props.onChangePage 를 추가해준다.
+      var student = {
+        kor:90,
+        eng:80,
+        total:function(){
+          var total=this.kor + this.eng
+          return total();
+        }
+      }
+      이처럼 함수가 저장되어 있을때는 ()를 넣어주었다.
+    따라서 this.props.onChangePage(); 를 넣어준다.
+  - bind(this) 를 사용하지 않으면 error 가 난다.
+    클릭이벤트, 이벤트를 연결할때는 반드시 컴포넌트를 this로 받아서 연결
+    을 해주어야만 제대로 작동한다.
+
+  14. li event 로 연결하기
+  - Mynav 한테도 위와같이 연결하는 것이다.
+      onChangePage={
+                    function(e){
+                      
+                    }.bind(this)
+                  }
+    를 추가해준다.
+  - 링크를 클릭시 텍스트가 변경이 되어야 하니 Mynav.js 의 a 태그를 수정한다.
+    Myheader 의 변경점을 참고하여 같은 스타일로 변경해준다.
+  - App.js 로 이동하여 Mynav 의 onChangePage 를 만들어준다. mode:read 
+    무엇을 클릭해도 html 이 나올것이다.
+  
+  15. 각 li 에도 HTML 을 click 했을 때와 같은 효과 주기(반복문)
+  - 사용자가 뭘 선택했는지에 대한 번호를 저장하기 위한 함수를 state에 추가
+    이름은 selected_id 로 지정해준 뒤 read 일때 값의 변화를 만들어내기 위한
+    과정이므로 else if 부분에 내용(반복문)을 추가해준다.
+    for each 는 index 번호를 쓸수있는 문법이다.
+    for each 가 es6 이기에 ie 에서 사용불가한 이유로 사용못할 경우에는
+    직접 a 태그에 data 를 추가시키는 방법을 사용한다.
+  - Mynav.js 에서 a 태그에 data 를 추가해준다.
+      <a href="" data-id={data[i].id} onClick={function(e){
+                      e.preventDefault();
+                      this.props.onChangePage();
+                    }.bind(this)
+                  }
+                >
+ - 반복문을 사용하게 되었으니 else if 에서 임시로 사용했던 [0] 을 제거하고
+   사용자가 클릭한 요소의 data-id 값이 menus의 각 항목들이 있는지 확인하여
+   article 에 적용하도록 한다. 
+ - Mynav.js 에서 클릭시 onChangePage 가 실행했는데 사용자가 몇번을 클릭했
+   는지 알기위해서는 onChangePage 함수가 뭘 하는지 알아야 한다.
+   클릭한 요소는 javascript 에서 사용하기 위해 e.target 을 사용한다.
+   e.target 은 a 태그를 겨냥하고 있다.
+   속성의 값을 확인하는 방법에는 .getAttribute('data-id')로 사용가능하다.
+   속성명이 데이터로 시작하면
+   e.target.getAttribute('data-id') = e.target.dataset.id 로 줄여쓴다.
+   속성명이 데이터로 시작하지 않는다면
+   e.target.getAttribute('href') 로 쓰는 수 밖에 없다.
+- 이렇게 target 전달을 받은 뒤 App.js 로 Mynav 의 function 에 id 를 넣어준다.
+  임시로 만들었던 selected_id 를 id 로 받아온다.
+  하지만 menus 의 id 는 숫자이며, Mynav의 id 는 문자형이다. 이를 통일하기
+  위해서 Number 을 넣어주어야한다. selected_id:Number(id)
+  그 동안 parsInt 를 쓰기도 했다.
+- debugger 는 리엑트에서 사용하는데 중간점검을 위해 사용한다.
+  사용하면 해당지점에서 스탑하며 뭐가 선택되었는지 알려준다.
+- 본격적으로 while 문을 작성한다.
+- 메뉴들 마다 할 일을 넣어야 한다. i 가 변경될 수 있는 스테이트값까지 
+  넣어야 하기 때문에 단순한 숫자가 아니라 위치의 영역의 수를 입력해야만 한다.
+- let data = this.state.menus[i]; 이 문구는 i이 index인 0 이 반복문 범위에
+  있냐는 질문을 넘기는 것이다.
+- if 문을 통해 selected_id 에 받아진 내용이 일치한다면 타이틀과 내용을 
+  바꾸어 주도록 한다.
+- if 문이 완성되면 처음에 index를 0 으로 잡았던
+    _title=this.state.menus[0].title;
+    _desc=this.state.menus[0].desc;
+  내용을 주석처리한다.
+- 지금까진 데이터가 오고가는게 아닌 일방적인 출력을 하는걸로 이해하는게 좋다.
+  일을 시켜서 결과를 반영하라는 역할만을 수행하고 있기 때문이다.
+
+16. 업데이트기능 만들어보기-클릭이벤트발생시 모드 변경
+- li 태그를 만들어 생성 올리기 삭제 문구를 만들어준다.
+- controls 라는 컴포넌트를 만든다.(컴포넌트를 만든다는건 js 가 생성된다생각)
+- js 생성시 rcc 로 연결하고
+    <ul>
+          <li><a href="/create" className="btn">create</a></li>
+          <li><a href="/update" className="btn">update</a></li>
+          <li><input type="button" value="delete"></input></li>
+        </ul>
+  의 내용을 넣어준다.
+- setting -> 확장자 -> react Native 를 검색해서 설치한다.
+- 모드를 변경해주는 방법에 대해 생각해본다.
+- header를 클릭할 시 모드를 welcome 으로 바꾼다고 했었다. 그렇다면 
+  밑의 li 를 클릭햇을 때 모드를 변경하기 위해서는 Myheader.js 를 참고해본다.
+  Myheader.js 의 a 태그에서 클릭이 되었을 시 모드를 변경한다는문구를 찾아
+  작업중인 li 를 클릭했을 떄와 같은 형식이 되도록 Controls.js 를 변경한다.
+- 또한 app.js의 Myheader 에서 onChangePage 속성을 넣었듯이 Controls에도 추가한다.
+- chrome 의 확장의 react developer tools 를 다운받아 컴포넌트를 확인한다.
+- if 문의 내용을 추가하여 else if 로 create 와 update 를 만들어준다.
+
+17. Myarticle 변경
+- 기존의 Myarticle 을 주석 처리 한 뒤 ,{_article} 변수 생성
+- 기존의 Myarticle.js 를 ReadArticle.js 로변경한다.
+- import 로 모두 연결해준다.
+- {_article} 의 값이 없어 오류가 나니, constructor 로 이동하여 임시값을 준다.
+- render 로 넘어가 mode 를 체크해준다. welcome 일때 _article 의 변화를
+  주기 위해 추가로 _article 을 만들고 주석처리했던 내용을 넣어준다.
+  read 모드일때도 어떻게 변할지에 대한 내용을 추가해준다.
+  상황에 따라 들어가는 내용을 다르게 하기 위해 시행하는 작업이다.
+
+18. CreateArticle 에서 폼을 구현하기
+- 폼을 구현하기에 앞서 모드의 임시값을 지정해 주어야 한다.
+- app.js 로 이동하여 this.state 에 저장된 초기 모드인 welcome 을
+  create 으로 바꿔준다. 이유는 실시간으로 체크를 해야하기 때문이다.
+- input 을 작성한다. text 가 들어가기 때문에 타입은 텍스트로
+  이름(백으로 연결할때 중요) 은 title, placeholder 도 넣어준다.
+- 추라고 input 을 만들어준다. 여기서 p 태그 안에 넣는 이유는 한줄한줄
+  마다 구현을 하기 위함이다. textarea 의 경우는 스스로 닫을 수 없기에 함축불가
+- submit 인풋을 구현한다.
+
+20. CSS 수정하기
+- app.css 로 이동하여 간격과 관련된 간단한 css 를 수정한다.
+- 기본 내용은 hello React 를 구현하기 위한 css 로 전부 삭제해도 된다.
+
+21. form 을 event 로 연결하기
+- form 에서 전송버튼을 누르면 form 에게 onsubmit 이라는 이벤트가 일어난다.
+- react 이기 때문에 onSubmit 이 되어야 한다.
+- form 에 action 을 추가하여 create_process.js 로 연결한다.
+- 아무리 react 라 하여도 모든 페이지를 하나로 연결하는 것은 불가능 하다.
+- 페이지가 여러개인 react 를 만들때는 링크를 걸고 그거에 맞추어 페이지 기반
+  으로 다른 컴포넌트를 호출해서 다른 페이지로 이동을 해주어야 한다.
+- method 는 post 로 넘겨준다. get 이라고 넘겨주게 된다면 주소표시로 묻어가
+  암호화를 하지 않기 때문에 숨겨서 오게 되는 post 로 넘겨준다.
+  get 은 넘어가는 데이터양이 한정되어있기에 여기에는 좋은 방법이 아니다.
+- 해당 페이지는 전송을 누르면 이벤트가 발동이 되어야하기 때문에 속성에
+  onSubmit 을 추가해 준다.
+  e.preventDefault()를 이용해 form 의 기본 이벤트 기능을 일단 정지한 후,
+  alert 를 이용해 테스트 한다.
+- 하지만 여기까지 한 것은 서로 연동이 되는 것이 아닌 createArticle 에서
+  혼자만 작동한 것이다. 때문에 app.js 에서 mode === create 일때
+  this.state 의 menus 의 내용을 받아올 수 있도록 만들어주어야 한다.
+- else if 의 create 의 구문에서 onSubmit 을 넣어 createArticle 이 
+  쓸수 있는 함수명을 지정해준다.
+- createArticle 에게는 만약 네가 함수를 쓸 일이 생기게 되면
+  함수명 onsubmit 을 사용한 경우 두개의 매개변수를 가지고 뭘 할수 있다고
+  말해주는 것이다. 따라서 onSubmit 을 지정해줬기 때문에 createArticle
+  의 onSubmit 안에서 this.props.onSubmit(); 으로 연결을 해주어야 한다.
+  또한 this 를 썻기에 안과 밖의 this 를 연결해주어야 하므로
+  소속된 중괄호 바로 뒤에 .bind(this)로 연결해주어야 한다.
+- onSubmit 이 실행 되었을 때 이벤트로 tilte 과 desc 를 보낸다고 적는다.
+  사실 이러한 작동이 되는 곳은 createArticle 이 아닌 app.js 이다.
+
+22. 배열에 값 추가하기
+- 이렇게 폼으로 tilte 과 desc 를 추가하게 되면 이게 이 정보가 mynav 로
+  연결이 되어야 한다. 그러한 작을 위해 app.js 의 mynav 에서
+  배열을 수정해주어야 한다.
+- 배열을 추가하는 방법은 
+    let abc = [1,2];
+    abc.push(3)  -> 1,2,3
+  이 나오는 것을 통해 push 를 이용한다는 것을 알 수 있다.
+- this.state 위에 현재 숫자를 잡아준다. current_id 로 불변숫자를 잡아준다.
+  첫시작은 무조건 3이다. 라는 의미이다.
+- mode 가 create 일 때 할 일로 넘어가서
+  this.current_id = this.current_id + 1; (하나 더해서 4번이라 늘인다.)
+  라고 명령한 뒤 menus 에 값을 추가하도록
+  this.state.menus 에 push 를 추가해서 한세트를 더 추가해주도록 한다.
+  추가되는 내용은 {id:this.current_id, title:_title1, desc:_desc1} 이다.
+- 하지만 내용은 변하지 않는다. 왜냐하면 현재는 state 를 주긴 했지만 직접적
+  으로 바꾼 것이기 때문이다. 따라서 알아서 잘 바뀌게 하려면
+  setState 를 이용해야 한다.
+  setState 를 이용하여 this.state.menus 의 바뀐 값을 반영시킨다.
+
+- 추가적인 배열을 추가하는 방법(1)
+  concat 은 값을 추가하고 그걸 새로운 배열로 저장시키는 함수이다.
+    let arr = [1,2]
+    arr.push(3)
+    [1,2,3]
+
+    let arr2 = arr.concat(4);
+    (4)[1,2,3,4]
+  이 후 arr 은 몇개인가 하고 쳐보면 여전히 3이 나오게 된다.
+  concat 은 기존에 값에 추가를 하는 개념이기 때문이다.
+- 추가적인 배열을 추가하는 방법(2)
+    let arr3 = arr2;
+- 다시 this.state 의 모드를 기본값인 welcome 으로 변경해준다.
+
+23. 그만 만들어야 할때 shouldComponentUpdate 는 성능향상을 위해 사용
+- 세개까지 만들었으면 그만해라 라고 말하고 싶을때는
+  필요에 따라 컴포넌트를 실행할지 말지 업데이트를 할지 말지를 정하는것은
+  shouldComponentUpdate : 이 함수가 실행된 이후에 재실행을 할지말지를 
+  정하며 기본값은 TRUE 로 있어도 바로 실행하는데 FALSE 가 있다면 중단한다.
+- Mynav.js 의 component 로 이동하여 shouldComponentUpdate 함수를 만든다.
+- 만약 return false 이면 그 밑의 함수 실행하지 않는다. 기본으로 true로 작동함
+  처음 작동할때는 작동하지 않지만 그 다음부터는 작동한다. update 의 개념을
+  가지고 있기 때문이다.
+  shouldComponentUpdate 함수는 매개변수로 2개를 쓸 수 있다.
+    shouldComponentUpdate(nextProps, nextState){
+      if(this.props.color !== nextProps.color){
+        return true;
+      }
+      if(this.state.count !== nextState.count){
+        return true;
+      }
+      return false;
+    }
+  이 문장에서 this.props.color !== nextProps.color 조건이 성립한다면 
+  뒤의 문장을 실행하며 아니라면 절대 실행되지 않도록 한다.
+  
